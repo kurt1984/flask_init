@@ -1,6 +1,6 @@
 from flask import Flask
 import psycopg2
-
+from src.model import Customer
 
 
 def create_app(database, db_user):
@@ -23,7 +23,7 @@ def create_app(database, db_user):
     def customers():
         cur = db_connect()
         cur.execute("select * from raw_transactions")        
-        return cur.fetchall()
+        return [Customer(list).__dict__ for list in cur.fetchall()]
 
     @app.route("/customers/<id>")
     def customer_id(id):
@@ -31,6 +31,6 @@ def create_app(database, db_user):
         cur.execute('''select * 
                        from raw_transactions
                        where index = %s ''', (id,))        
-        return list(cur.fetchone())
+        return Customer(cur.fetchone()).__dict__ 
 
     return app
